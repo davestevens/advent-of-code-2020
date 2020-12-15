@@ -10,21 +10,19 @@ fn load_data(filename: &str) -> Vec<usize> {
 }
 
 fn run(values: &Vec<usize>, iteration: usize) -> usize {
-    let mut numbers: HashMap<usize, Vec<usize>> = HashMap::new();
+    let mut numbers: HashMap<usize, (usize, usize)> = HashMap::new();
     let mut prev_number: usize = 0;
     for (index, value) in values.iter().enumerate() {
-        numbers.insert(*value, vec![index + 1]);
+        numbers.insert(*value, (index + 1, index + 1));
         prev_number = *value;
     }
+
     for index in values.len()+1..=iteration {
-        let prev_indexes = numbers.get(&prev_number).unwrap();
-        let current: usize = if prev_indexes.len() < 2 {
-            0
-        } else {
-            prev_indexes[prev_indexes.len()-1] - prev_indexes[prev_indexes.len()-2]
-        };
-        let prev_indexes: &mut Vec<usize> = numbers.entry(current).or_insert(vec![]);
-        prev_indexes.push(index);
+        let (prev_0, prev_1) = numbers.get(&prev_number).unwrap();
+        let current = prev_1 - prev_0;
+        let prev_indexes: &mut (usize, usize) = numbers.entry(current).or_insert((0, index));
+        prev_indexes.0 = prev_indexes.1;
+        prev_indexes.1 = index;
         prev_number = current;
     }
 
